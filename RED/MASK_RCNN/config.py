@@ -1,8 +1,4 @@
 class ShapesConfig(Config):
-    """Configuration for training on the toy shapes dataset.
-    Derives from the base Config class and overrides values specific
-    to the toy shapes dataset.
-    """
     NAME = "shapes"
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
@@ -21,5 +17,5 @@ class ShapesConfig(Config):
 
     VALIDATION_STEPS = 5
     
-config = ShapesConfig("shapes")
+config = ShapesConfig()
 config.display()
