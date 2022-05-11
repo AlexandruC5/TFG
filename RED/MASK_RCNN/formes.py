@@ -59,9 +59,9 @@ class ShapesDataset(utils.Dataset):
 
     # Carga las formas geometrias pedidas
     def load_shapes(self, count, height, width):
-        self.add_class("shpaes", 1, "square")
-        self.add_class("shpaes", 2, "circle")
-        self.add_class("shpaes", 3, "triangle")
+        self.add_class("shapes", 1, "square")
+        self.add_class("shapes", 2, "circle")
+        self.add_class("shapes", 3, "triangle")
 
         for i in range(count):
             bg_color, shapes = self.random_image(height, width)
@@ -75,7 +75,7 @@ class ShapesDataset(utils.Dataset):
         info = self.image_info[image_id]
         bg_color = np.array(info['bg_color']).reshape([1, 1, 3])
         image = np.ones([info['height'], info['width'], 3], dtype=np.uint8)
-        image = image*bg_color.astype(np.uint8)
+        image = image * bg_color.astype(np.uint8)
         for shape, color, dims in info['shapes']:
             image = self.draw_shape(image, shape, dims, color)
         return image
@@ -153,3 +153,15 @@ class ShapesDataset(utils.Dataset):
 dataset_train = ShapesDataset()
 dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
+
+#Cargamos y enseñamos las muestras randomizdas
+
+image_ids = np.random.choice(dataset_train.image_ids, 4)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    visualize.display_top_masks(image,mask,class_ids, dataset_train.class_names)
+
+
+
+
