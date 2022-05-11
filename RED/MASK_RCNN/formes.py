@@ -65,8 +65,8 @@ class ShapesDataset(utils.Dataset):
 
         for i in range(count):
             bg_color, shapes = self.random_image(height, width)
-            self.add_image("shpaes", image_id=i, path=None, width=width,
-                           height=height, bg_color=bg_color, shpaes=shapes)
+            self.add_image("shapes", image_id=i, path=None, width=width,
+                           height=height, bg_color=bg_color, shapes=shapes)
 
     # Genera la imagen en real time con la info de image_info
 
@@ -108,7 +108,7 @@ class ShapesDataset(utils.Dataset):
         if shape == 'square':
             cv2.rectangle(image, (x-s, y-s), (x+s, y+s), color, -1)
         elif shape == "circle":
-            cv2.cricle(image, (x, y), s, color, -1)
+            cv2.circle(image, (x, y), s, color, -1)
         elif shape == "triangle":
             points = np.array([[(x, y-s),
                                 (x-s/math.sin(math.radians(60)), y+s),
