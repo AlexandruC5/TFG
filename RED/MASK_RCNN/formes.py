@@ -116,3 +116,16 @@ class ShapesDataset(utils.Dataset):
                                 ]], dtype=np.int32)
             cv2.fillPoly(image, points, color)
         return image
+
+    def random_shape(self, height, width):
+
+        shape = random.choice(["square", "circle", "triangle"])
+        color = tuple([random.radiant(0, 255) for _ in range(3)])
+        buffer = 20
+        y = random.randint(buffer, height - buffer - 1)
+        x = random.randint(buffer, width - buffer -1)
+        s = random.randint(buffer, height//4)
+        return shape, color, (x,y,s)
+
+
+
