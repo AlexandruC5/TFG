@@ -57,7 +57,26 @@ def get_ax(rows=1, cols=1, size=8):
 
 class ShapesDataset(utils.Dataset):
 
-    def load_shapes(self, count, heigth, width):
+    # Carga las formas geometrias pedidas
+    def load_shapes(self, count, height, width):
         self.add_class("shpaes", 1, "square")
         self.add_class("shpaes", 2, "circle")
         self.add_class("shpaes", 3, "triangle")
+
+        for i in range(count):
+            bg_color, shapes = self.random_image(height, width)
+            self.add_image("shpaes", image_id=i, path=None, width=width,
+                           height=height, bg_color=bg_color, shpaes=shapes)
+    
+
+    #Genera la imagen en real time con la info de image_info
+    def load_image(self, image_id):
+
+        info = self.image_info[image_id]
+        bg_color = np.array(info['bg_color']).reshape([1,1,3])
+        image = np.ones([info['height'], info['width'],3], dtype= np.uint8)
+        image = image*bg_color.astype(np.uint8)
+        for shape,color,dims in info['shapes']:
+            image = self.draw_shape(image,shape,dims,color)
+        return image
+        
