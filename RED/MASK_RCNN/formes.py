@@ -67,16 +67,52 @@ class ShapesDataset(utils.Dataset):
             bg_color, shapes = self.random_image(height, width)
             self.add_image("shpaes", image_id=i, path=None, width=width,
                            height=height, bg_color=bg_color, shpaes=shapes)
-    
 
-    #Genera la imagen en real time con la info de image_info
+    # Genera la imagen en real time con la info de image_info
+
     def load_image(self, image_id):
 
         info = self.image_info[image_id]
-        bg_color = np.array(info['bg_color']).reshape([1,1,3])
-        image = np.ones([info['height'], info['width'],3], dtype= np.uint8)
+        bg_color = np.array(info['bg_color']).reshape([1, 1, 3])
+        image = np.ones([info['height'], info['width'], 3], dtype=np.uint8)
         image = image*bg_color.astype(np.uint8)
-        for shape,color,dims in info['shapes']:
-            image = self.draw_shape(image,shape,dims,color)
+        for shape, color, dims in info['shapes']:
+            image = self.draw_shape(image, shape, dims, color)
         return image
-        
+
+    def image_reference(self, image_id):
+        info = self.image_info[image_id]
+        if info["source"] == "shapes":
+            return info["shapes"]
+        else:
+            super(self.__class__).image_reference(self, image_id)
+
+    def load_mask(self, image_id):
+        info = self.image_info[image_id]
+        shapes = info['shapes']
+        count = len(shapes)
+        mask = np.zeros([info['height'], info['width'], count], dtype=np.uint8)
+        for i, (shape, _, dims) in enumerate(info['shapes']):
+            mask[:, :, i:i +
+                 1] = self.draw_shape(mask[:, :, i:i+1].copy(), shape, dims, 1)
+        occlusion = np.logical_not(mask[:, :, -1]).astype(np.uint8)
+        for i in range(count-2, -1, -1):
+            mask[:, :, i] = mask[:, :, i] * occlusion
+            occlusion = np.logical_and(
+                occlusion, np.logical_not(mask[:, :, i]))
+        class_ids = np.array([self.class_names.index(s[0]) for s in shapes])
+        return mask.astype(np.bool), class_ids.astype(np.int32)
+
+    def draw_shape(self, image, shape, dims, color):
+        x, y, s = dims
+        if shape == 'square':
+            cv2.rectangle(image, (x-s, y-s), (x+s, y+s), color, -1)
+        elif shape == "circle":
+            cv2.cricle(image, (x, y), s, color, -1)
+        elif shape == "triangle":
+            points = np.array([[(x, y-s),
+                                (x-s/math.sin(math.radians(60)), y+s),
+                                (x+s/math.sin(math.radians(60)), y+s),
+                                ]], dtype=np.int32)
+            cv2.fillPoly(image, points, color)
+        return image
