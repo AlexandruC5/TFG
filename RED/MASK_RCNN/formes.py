@@ -120,12 +120,36 @@ class ShapesDataset(utils.Dataset):
     def random_shape(self, height, width):
 
         shape = random.choice(["square", "circle", "triangle"])
-        color = tuple([random.radiant(0, 255) for _ in range(3)])
+        color = tuple([random.randint(0, 255) for _ in range(3)])
         buffer = 20
         y = random.randint(buffer, height - buffer - 1)
-        x = random.randint(buffer, width - buffer -1)
+        x = random.randint(buffer, width - buffer - 1)
         s = random.randint(buffer, height//4)
-        return shape, color, (x,y,s)
+
+        return shape, color, (x, y, s)
+
+    def random_image(self, height, width):
+        """Creates random specifications of an image with multiple shapes.
+        Returns the background color of the image and a list of shape
+        specifications that can be used to draw the image.
+        """
+        bg_color = np.array([random.randint(0, 255) for _ in range(3)])
+    
+        shapes = []
+        boxes = []
+        N = random.randint(1, 4)
+        for _ in range(N):
+            shape, color, dims = self.random_shape(height, width)
+            shapes.append((shape, color, dims))
+            x, y, s = dims
+            boxes.append([y-s, x-s, y+s, x+s])
+      
+        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.3)
+        shapes = [s for i, s in enumerate(shapes) if i in keep_ixs]
+        return bg_color, shapes
 
 
-
+# Entrenamiento del set de datos de las figuras randoms generadas.
+dataset_train = ShapesDataset()
+dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.prepare()
