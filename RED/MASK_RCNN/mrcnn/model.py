@@ -2844,6 +2844,9 @@ def norm_boxes_graph(boxes, shape):
     return tf.divide(boxes - shift, scale)
 
 
+
+
+
 def denorm_boxes_graph(boxes, shape):
     """Converts boxes from normalized coordinates to pixel coordinates.
     boxes: [..., (y1, x1, y2, x2)] in normalized coordinates

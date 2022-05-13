@@ -2,6 +2,8 @@ from mrcnn.model import log
 from mrcnn import visualize
 from mrcnn import utils
 from mrcnn.config import Config
+from mrcnn import model
+import mrcnn.model
 import os
 import sys
 import random
@@ -134,7 +136,7 @@ class ShapesDataset(utils.Dataset):
         specifications that can be used to draw the image.
         """
         bg_color = np.array([random.randint(0, 255) for _ in range(3)])
-    
+
         shapes = []
         boxes = []
         N = random.randint(1, 4)
@@ -143,8 +145,9 @@ class ShapesDataset(utils.Dataset):
             shapes.append((shape, color, dims))
             x, y, s = dims
             boxes.append([y-s, x-s, y+s, x+s])
-      
-        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.3)
+
+        keep_ixs = utils.non_max_suppression(
+            np.array(boxes), np.arange(N), 0.3)
         shapes = [s for i, s in enumerate(shapes) if i in keep_ixs]
         return bg_color, shapes
 
@@ -154,13 +157,54 @@ dataset_train = ShapesDataset()
 dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
-#Cargamos y enseñamos las muestras randomizdas
+# Validation dataset
+dataset_val = ShapesDataset()
+dataset_val.load_shapes(50, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.prepare()
+
+# Cargamos y enseñamos las muestras randomizdas
 
 image_ids = np.random.choice(dataset_train.image_ids, 4)
 for image_id in image_ids:
     image = dataset_train.load_image(image_id)
     mask, class_ids = dataset_train.load_mask(image_id)
-    visualize.display_top_masks(image,mask,class_ids, dataset_train.class_names)
+    visualize.display_top_masks(
+        image, mask, class_ids, dataset_train.class_names)
 
 
 
+
+class InferenceConfig(ShapesConfig):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+
+inference_config = InferenceConfig()
+
+# Recreate the model in inference mode
+model = model.MaskRCNN(mode="inference", 
+                          config=inference_config,
+                          model_dir=MODEL_DIR)
+
+# Get path to saved weights
+# Either set a specific path or find last trained weights
+# model_path = os.path.join(ROOT_DIR, ".h5 file name here")
+model_path = model.find_last()
+
+# Load trained weights
+print("Loading weights from ", model_path)
+model.load_weights(model_path, by_name=True)
+
+# Test on a random image
+image_id = random.choice(dataset_val.image_ids)
+original_image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+    model.load_image_gt(dataset_val, inference_config, 
+                           image_id, use_mini_mask=False)
+
+log("original_image", original_image)
+log("image_meta", image_meta)
+log("gt_class_id", gt_class_id)
+log("gt_bbox", gt_bbox)
+log("gt_mask", gt_mask)
+
+visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, 
+                            dataset_train.class_names, figsize=(8, 8))
