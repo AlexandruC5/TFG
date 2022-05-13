@@ -21,7 +21,8 @@ def activate(weights, inputs):
 # Transfer neuron activation
 def transfer(activation):
 	return 1.0 / (1.0 + exp(-activation))
- 
+ #exp => número de euler
+
 # Forward propagate input to a network output
 def forward_propagate(network, row):
 	inputs = row
@@ -99,3 +100,10 @@ network = initialize_network(n_inputs, 2, n_outputs)
 train_network(network, dataset, 0.5, 20, n_outputs)
 for layer in network:
 	print(layer)
+
+
+	# Make a prediction with a network
+def predict(network, row):
+	outputs = forward_propagate(network, row)
+	return outputs.index(max(outputs))
+
