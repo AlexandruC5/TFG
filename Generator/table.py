@@ -13,8 +13,18 @@ top = box(pos=vector(0, 0, 0),
 
 # Patas de la mesa
 
-pata1 = cylinder(pos=vector(8.5, 0, -4.5), axis=vector(0, -5, 0), radius=0.5)
-pata2 = cylinder(pos=vector(-8.5, 0, 4.5), axis=vector(0, -5, 0), radius=0.5)
-pata3 = cylinder(pos=vector(8.5, 0, 4.5), axis=vector(0, -5, 0), radius=0.5)
-pata4 = cylinder(pos=vector(-8.5, 0, -4.5),axis=vector(0, -5, 0), radius=0.5)
- 
+# pata1 = derecha arriba
+pata1 = cylinder(pos=vector(8.5, 0, -4.5),
+                 axis=vector(0, -5, 0), radius=0.5, color=color.red)
+
+# pata 2= izquierda abajo
+pata2 = cylinder(pos=vector(-8.5, 0, 4.5), axis=vector(0, -
+                 5, 0), radius=0.5, color=color.yellow)
+
+
+pata3 = cylinder(pos=vector(8.5, 0, 4.5), axis=vector(
+    0, -5, 0), radius=0.5, color=color.green)
+
+
+pata4 = cylinder(pos=vector(-8.5, 0, -4.5),
+                 axis=vector(0, -5, 0), radius=0.5, color=color.purple)
