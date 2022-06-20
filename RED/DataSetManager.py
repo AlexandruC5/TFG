@@ -5,3 +5,5 @@ import torchvision
 
 dataset = foz.load_zoo_dataset("quickstart")
 session = fo.launch_app(dataset)
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
