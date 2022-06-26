@@ -4,9 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 import torchvision
-from torchvision import *
-from torch import *
-
+import torchvision.transforms as transforms
+import torchvision.datasets as datasets
 import matplotlib.pyplot as plt
 import os
 
@@ -70,7 +69,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
-for epoch in range(2):
+for epoch in range(3):
 
     running_loss = 0.0
 
