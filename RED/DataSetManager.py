@@ -1,12 +1,14 @@
-import fiftyone as fo
-import fiftyone.zoo as foz
-from sklearn.metrics import label_ranking_average_precision_score
+
+import torch.optim as optim
+import torch.nn as nn
+import torch.nn.functional as F
 import torch
 import torchvision
 from torchvision import *
 from torch import *
+
 import matplotlib.pyplot as plt
-import os 
+import os
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -39,4 +41,30 @@ print("Image Size: ", image.size())
 print("Dataset : ", dataset)
 print(labels)
 
-model = torchvision.models.detection.faster_rcnn(dataset)
+
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 25, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+
+        return x
+
+
+net = Net()
+
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
