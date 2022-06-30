@@ -14,7 +14,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 from keras.preprocessing import image
 import matplotlib.pyplot as plt
 import cv2
@@ -45,12 +44,14 @@ train_table_dir = os.path.join(train_dir, 'table')
 
 # DIRECTORIOS DE VALIDACION DE CADA CLASE
 
-
 val_bed_dir = os.path.join(val_dir, 'bed')
 val_chair_dir = os.path.join(val_dir, 'chair')
 val_sofa_dir = os.path.join(val_dir, 'sofa')
 val_swivelchair_dir = os.path.join(val_dir, 'swivelchair')
 val_table_dir = os.path.join(val_dir, 'table')
+
+# CANTIDAD DE IMAGENES DE CADA DIRECTORIO
+
 num_bed_train = len(os.listdir(train_bed_dir))
 num_chair_train = len(os.listdir(train_chair_dir))
 num_sofa_train = len(os.listdir(train_sofa_dir))
@@ -159,7 +160,7 @@ model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accurac
 model.summary()
 
 
-## train model
+# ## train model
 # history = model.fit(train_generator, 
 #                     epochs=NUM_EPOCHS, 
 #                     steps_per_epoch= num_train_images // batchsize, 
@@ -167,15 +168,16 @@ model.summary()
 #                     validation_steps = num_val_images // batchsize)
 
 
-# Save the weights
-#model.save_weights('./model')
+
+# model.save_weights('./model')
 
 # Restore the weights
 model.load_weights('./model')
 
 
+# test with the generated 3D model of the table
 
-img_path = os.path.abspath('tabletest.jpg')
+img_path = os.path.abspath('TEST3.jpg')
 img = image.image_utils.load_img(img_path, target_size=(img_height, img_width))
 img_tensor = image.image_utils.img_to_array(img)
 img_tensor = np.expand_dims(img_tensor, axis =0)
